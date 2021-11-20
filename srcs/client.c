@@ -6,7 +6,7 @@
 /*   By: dienasci <dienasci@student.42sp.org.br >   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/13 10:27:23 by dienasci          #+#    #+#             */
-/*   Updated: 2021/11/20 10:28:07 by dienasci         ###   ########.fr       */
+/*   Updated: 2021/11/20 18:12:54 by dienasci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,14 @@ void send_char(int *bits, int PID)
 		{
 			kill(PID, SIGUSR1);
 			pause();
-			usleep(27500);
+			usleep(30000);
 			index++;
 		}
 		else
 		{
 			kill(PID, SIGUSR2);
 			pause();
-			usleep(27500);
+			usleep(30000);
 			index++;
 		}
 	}
