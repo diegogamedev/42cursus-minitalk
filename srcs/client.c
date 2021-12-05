@@ -6,7 +6,7 @@
 /*   By: dienasci <dienasci@student.42sp.org.br >   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/13 10:27:23 by dienasci          #+#    #+#             */
-/*   Updated: 2021/12/05 12:45:41 by dienasci         ###   ########.fr       */
+/*   Updated: 2021/12/05 13:16:15 by dienasci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void connection_terminate(pid_t server_pid)
 		usleep(50);
 		kill(server_pid, SIGUSR2);
 	}
-	ft_putstr_fd("Done!",1);
+	ft_putstr_fd("\nDone!",1);
 	exit(0);
 }
 
@@ -80,6 +80,8 @@ void sig_handler(int sig, siginfo_t *siginfo, void *unused)
 	(void)siginfo;
 	(void)unused;
 	if (sig == SIGUSR1)
+		ft_putstr_fd("<- 1 byte\n", 1);
+	if (sig == SIGUSR2)
 		ft_putchar_fd('.', 1);
 	send_bit(0, 0);
 }

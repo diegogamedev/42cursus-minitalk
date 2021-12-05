@@ -6,7 +6,7 @@
 /*   By: dienasci <dienasci@student.42sp.org.br >   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/13 10:27:25 by dienasci          #+#    #+#             */
-/*   Updated: 2021/12/05 12:05:57 by dienasci         ###   ########.fr       */
+/*   Updated: 2021/12/05 13:15:26 by dienasci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int main(void)
 {
 	struct sigaction e;
 
-	ft_printf("PID: %d", getpid());
+	ft_printf("PID: %d\n", getpid());
 	e.sa_flags = SA_SIGINFO;
 	e.sa_sigaction = sig_handler;
 	sigaction(SIGUSR1, &e, 0);
