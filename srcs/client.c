@@ -6,84 +6,98 @@
 /*   By: dienasci <dienasci@student.42sp.org.br >   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/13 10:27:23 by dienasci          #+#    #+#             */
-/*   Updated: 2021/11/20 18:12:54 by dienasci         ###   ########.fr       */
+/*   Updated: 2021/12/05 12:45:41 by dienasci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minitalk.h"
 
-void	feedback(int sig, siginfo_t *info, void *context)
+int error_check(int argc, char ***argv)
 {
-	(void)context;
-	(void)info;
-	if(sig == SIGCONT)
-		ft_printf(".");
+	int pid;
+
+	if (argc != 3)
+	{
+		ft_printf("Insufficient arguments. (usage: ./client [PID] [Message]");
+		return (0);
+	}
+	pid = ft_atoi((*argv)[1]);
+	if (!(100 <= pid && pid <= 99998))
+	{
+		ft_printf("Invalid PID, value must be between 99 and 10000");
+		return (0);
+	}
+	if (!(*argv)[2])
+	{
+		ft_printf("Invalid message!");
+		return (0);
+	}
+	return (1);
 }
 
-void send_char(int *bits, int PID)
+void connection_terminate(pid_t server_pid)
 {
-	int	index;
+	int i;
 
-	index = 0;
-	while (index < 8)
+	i = 8;
+	while (i--)
 	{
-		if (bits[index] == 0)
-		{
-			kill(PID, SIGUSR1);
-			pause();
-			usleep(30000);
-			index++;
-		}
-		else
-		{
-			kill(PID, SIGUSR2);
-			pause();
-			usleep(30000);
-			index++;
-		}
+		usleep(50);
+		kill(server_pid, SIGUSR2);
 	}
+	ft_putstr_fd("Done!",1);
+	exit(0);
 }
 
-void	codify(int PID, char *text)
+void send_bit(char *s, pid_t pid)
 {
-	int	binary[8];
-	int	i;
-	int	j;
-	unsigned char	c;
+	static int i = 8;
+	static unsigned char c;
+	static char *str;
+	static pid_t server_pid;
 
-	i = 0;
-	while(text[i])
+	if (s)
 	{
-		c = text[i];
-		j = 0;
-		while(j < 8)
-		{
-			binary[7 - j] = (c >> j) & 1;
-			j++;
-		}
-		binary[j] = '\0';
-		send_char(binary, PID);
-		i++;
+		str = s;
+		server_pid = pid;
+		c = *str;
 	}
+	if (!i)
+	{
+		i = 8;
+		c = *(++str);
+		if (!c)
+			connection_terminate(server_pid);
+	}
+	if (c >> --i & 0x01)
+		kill(server_pid, SIGUSR1);
+	else if (c)
+		kill(server_pid, SIGUSR2);
+}
+
+void sig_handler(int sig, siginfo_t *siginfo, void *unused)
+{
+	(void)siginfo;
+	(void)unused;
+	if (sig == SIGUSR1)
+		ft_putchar_fd('.', 1);
+	send_bit(0, 0);
 }
 
 int main(int argc, char **argv)
 {
-	int					PID;
-	char				*text;
-	struct sigaction	a;
+	struct sigaction e;
+	int PID;
 
-	if (argc != 3)
-	{
-		ft_printf("Wrong Usage: ./client [PID] [text]");
-		exit(0);
-	}
-	a.sa_flags = SA_SIGINFO;
-	a.sa_sigaction = feedback;
-	sigaction(SIGCONT, &a, 0);
+	if (!error_check(argc, &argv))
+		return (1);
 	PID = ft_atoi(argv[1]);
-	text = argv[2];
-	ft_printf("Sending \"%s\" to %d", text, PID);
-	codify(PID, text);
-	exit(0);
+	e.sa_flags = SA_SIGINFO;
+	e.sa_sigaction = sig_handler;
+	sigaction(SIGUSR1, &e, 0);
+	sigaction(SIGUSR2, &e, 0);
+	send_bit(argv[2], PID);
+	while (1)
+		pause();
+	return (0);
 }

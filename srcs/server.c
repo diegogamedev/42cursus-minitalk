@@ -6,66 +6,51 @@
 /*   By: dienasci <dienasci@student.42sp.org.br >   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/13 10:27:25 by dienasci          #+#    #+#             */
-/*   Updated: 2021/11/15 11:54:10 by dienasci         ###   ########.fr       */
+/*   Updated: 2021/12/05 12:05:57 by dienasci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minitalk.h"
 
-int	power(int base, int a)
+void sig_handler(int sig, siginfo_t *siginfo, void *unused)
 {
-	if (a != 0)
-		return (base * power(base, a - 1));
+	static unsigned char c = 0x00;
+	static int cnt = 0;
+	static pid_t client_pid = 0;
+
+	(void)unused;
+	if (!client_pid)
+		client_pid = siginfo->si_pid;
+	c |= (sig == SIGUSR1);
+	if (++cnt == 8)
+	{
+		cnt = 0;
+		if (c == 0x00)
+		{
+			client_pid = 0;
+			return;
+		}
+		ft_putchar_fd(c, 1);
+		c = 0x00;
+		kill(client_pid, SIGUSR1);
+	}
 	else
-		return (1);
-}
-
-void	decode(char *bits)
-{
-	unsigned char	c;
-	int				index;
-
-	index = 0;
-	c = 0;
-	while (bits[index])
 	{
-		if (bits[index] == '1')
-			c += power(2, 7 - index);
-		index++;
+		c <<= 1;
+		kill(client_pid, SIGUSR2);
 	}
-	ft_printf("%c", c);
 }
 
-void	listener(int sig, siginfo_t *info, void *context)
+int main(void)
 {
-	static int	count = 0;
-	static char	bits[8];
+	struct sigaction e;
 
-	(void)context;
-	if (sig == SIGUSR1)
-		bits[count] = '0';
-	if (sig == SIGUSR2)
-		bits[count] = '1';
-	count++;
-	if (count == 8)
-	{
-		decode(bits);
-		count = 0;
-	}
-	kill(info->si_pid, SIGCONT);
-}
-
-int	main(void)
-{
-	struct sigaction	a;
-
-	ft_printf("PID: %d\nWaiting for Signals\n", getpid());
-	a.sa_flags = SA_SIGINFO;
-	a.sa_sigaction = listener;
-	sigaction(SIGUSR1, &a, 0);
-	sigaction(SIGUSR2, &a, 0);
+	ft_printf("PID: %d", getpid());
+	e.sa_flags = SA_SIGINFO;
+	e.sa_sigaction = sig_handler;
+	sigaction(SIGUSR1, &e, 0);
+	sigaction(SIGUSR2, &e, 0);
 	while (1)
-	{
 		pause();
-	}
+	return (0);
 }
