@@ -6,15 +6,15 @@
 /*   By: dienasci <dienasci@student.42sp.org.br >   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/13 10:27:23 by dienasci          #+#    #+#             */
-/*   Updated: 2021/12/05 14:09:48 by dienasci         ###   ########.fr       */
+/*   Updated: 2021/12/05 16:31:09 by dienasci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minitalk.h"
 
-int error_check(int argc, char ***argv)
+int	error_check(int argc, char ***argv)
 {
-	int pid;
+	int	pid;
 
 	if (argc != 3)
 	{
@@ -35,9 +35,9 @@ int error_check(int argc, char ***argv)
 	return (1);
 }
 
-void connection_terminate(pid_t server_pid)
+void	connection_terminate(pid_t server_pid)
 {
-	int i;
+	int	i;
 
 	i = 8;
 	while (i--)
@@ -45,16 +45,16 @@ void connection_terminate(pid_t server_pid)
 		usleep(50);
 		kill(server_pid, SIGUSR2);
 	}
-	ft_putstr_fd("\nDone!",1);
+	ft_putstr_fd("\nDone!", 1);
 	exit(0);
 }
 
-void send_bit(char *s, pid_t pid)
+void	send_bit(char *s, pid_t pid)
 {
-	static int i = 8;
-	static unsigned char c;
-	static char *str;
-	static pid_t server_pid;
+	static int				i = 8;
+	static unsigned char	c;
+	static char				*str;
+	static pid_t			server_pid;
 
 	if (s)
 	{
@@ -75,7 +75,7 @@ void send_bit(char *s, pid_t pid)
 		kill(server_pid, SIGUSR2);
 }
 
-void sig_handler(int sig, siginfo_t *siginfo, void *unused)
+void	sig_handler(int sig, siginfo_t *siginfo, void *unused)
 {
 	(void)siginfo;
 	(void)unused;
@@ -86,19 +86,19 @@ void sig_handler(int sig, siginfo_t *siginfo, void *unused)
 	send_bit(0, 0);
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	struct sigaction e;
-	int PID;
+	struct sigaction	e;
+	int					pid;
 
 	if (!error_check(argc, &argv))
 		return (1);
-	PID = ft_atoi(argv[1]);
+	pid = ft_atoi(argv[1]);
 	e.sa_flags = SA_SIGINFO;
 	e.sa_sigaction = sig_handler;
 	sigaction(SIGUSR1, &e, 0);
 	sigaction(SIGUSR2, &e, 0);
-	send_bit(argv[2], PID);
+	send_bit(argv[2], pid);
 	while (1)
 		pause();
 	return (0);

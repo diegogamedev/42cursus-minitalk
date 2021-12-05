@@ -6,17 +6,17 @@
 /*   By: dienasci <dienasci@student.42sp.org.br >   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/13 10:27:25 by dienasci          #+#    #+#             */
-/*   Updated: 2021/12/05 13:15:26 by dienasci         ###   ########.fr       */
+/*   Updated: 2021/12/05 16:32:16 by dienasci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minitalk.h"
 
-void sig_handler(int sig, siginfo_t *siginfo, void *unused)
+void	sig_handler(int sig, siginfo_t *siginfo, void *unused)
 {
-	static unsigned char c = 0x00;
-	static int cnt = 0;
-	static pid_t client_pid = 0;
+	static unsigned char	c = 0x00;
+	static int				cnt = 0;
+	static pid_t			client_pid = 0;
 
 	(void)unused;
 	if (!client_pid)
@@ -28,7 +28,7 @@ void sig_handler(int sig, siginfo_t *siginfo, void *unused)
 		if (c == 0x00)
 		{
 			client_pid = 0;
-			return;
+			return ;
 		}
 		ft_putchar_fd(c, 1);
 		c = 0x00;
@@ -41,9 +41,9 @@ void sig_handler(int sig, siginfo_t *siginfo, void *unused)
 	}
 }
 
-int main(void)
+int	main(void)
 {
-	struct sigaction e;
+	struct sigaction	e;
 
 	ft_printf("PID: %d\n", getpid());
 	e.sa_flags = SA_SIGINFO;
