@@ -10,30 +10,29 @@ LIBFT = libft-printf
 
 INCLUDES = includes
 
-%.o : %.c
-	@$(CC) $(FLAGS) $< -c -I $(INCLUDES)
-
 all: $(SERVER) $(CLIENT)
 
-$(SERVER): srcs/server.o
+$(SERVER):
 		@printf "Compiling $(RE)server...$(RC)\n"
-		make -C $(LIBFT) all -s
-		$(CC) $(FLAGS) server.o $(LIBFT)/libftprintf.a -o server
+		@$(CC) $(FLAGS) srcs/server.c -c -I $(INCLUDES)
+		@make -C $(LIBFT) all -s
+		@$(CC) $(FLAGS) server.o $(LIBFT)/libftprintf.a -o $(SERVER)
 
-$(CLIENT): srcs/client.o
+$(CLIENT):
 		@printf "Compiling $(CY)client...$(RC)\n"
-		make -C $(LIBFT) all -s
-		$(CC) $(FLAGS) client.o $(LIBFT)/libftprintf.a -o client
+		@$(CC) $(FLAGS) srcs/client.c -c -I $(INCLUDES)
+		@make -C $(LIBFT) all -s
+		@$(CC) $(FLAGS) client.o $(LIBFT)/libftprintf.a -o $(CLIENT)
 
 clean:
 		@printf "$(YE)Cleaning .o...$(RC)\n"
-		make -C $(LIBFT) clean -s
-		rm -rf client.o server.o
+		@make -C $(LIBFT) clean -s
+		@rm -rf client.o server.o
 
 fclean: clean
 		@printf "$(YE)Cleaning executables and .a...$(RC)\n"
-		make -C $(LIBFT) fclean -s
-		rm -rf $(CLIENT) $(SERVER)
+		@make -C $(LIBFT) fclean -s
+		@rm -rf $(CLIENT) $(SERVER)
 
 re: fclean all
 
